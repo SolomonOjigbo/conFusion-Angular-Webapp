@@ -9,8 +9,6 @@ import { Comment } from '../shared/comment';
 
 
 
-
-
 @Component({
   selector: 'app-dishdetail',
   templateUrl: './dishdetail.component.html',
@@ -28,7 +26,7 @@ export class DishdetailComponent implements OnInit {
   commentForm: FormGroup;
   comment: Comment;
   @ViewChild('cform') commentFormDirective;
-
+  dishcopy: Dish;
 
 
   formErrors = {
@@ -66,7 +64,7 @@ export class DishdetailComponent implements OnInit {
     errmess => this.errMess = <any>errmess);
      this.route.params
      .pipe(switchMap((params: Params) => this.dishService.getDish(params['id'])))
-      .subscribe(dish => {this.dish = dish,
+      .subscribe(dish => {this.dish = dish; this.dishcopy = dish;
         errmess => this.errMess = <any>errmess; this.setPrevNext(dish.id); });
   }
 
@@ -84,7 +82,7 @@ export class DishdetailComponent implements OnInit {
     this.commentForm = this.fb.group({
       author:  ['', [Validators.required, Validators.minLength(2), Validators.maxLength(25)] ],
       comment: ['', [Validators.required, Validators.minLength(4)] ],
-      rating:  ['',],
+      rating:  5,
     });
 
   this.commentForm.valueChanges
@@ -97,28 +95,32 @@ export class DishdetailComponent implements OnInit {
   
   
   onSubmit() {
-    if (this.commentForm.value) {
-      this.comment = new Comment();
-      this.comment.author = this.commentForm.value.author;
+      this.comment = this.commentForm.value;
+      // this.comment.author = this.commentForm.value.author;
       this.comment.date = new Date().toISOString();
-      this.comment.comment = this.commentForm.value.comment;
-      this.comment.rating = this.commentForm.value.rating;
+      // this.comment.comment = this.commentForm.value.comment;
+      // this.comment.rating = this.commentForm.value.rating;
+      this.dishcopy.comments.push(this.comment);
+      this.dishService.putDish(this.dishcopy)
+      .subscribe(dish => {
+        this.dish = dish; this.dishcopy = dish;
+      },
+      errmess => { this.dish = null; this.dishcopy = null; this.errMess = <any>errmess; });
 
-      this.dish.comments.push(this.comment);
+
+      this.commentFormDirective.resetForm();
+      this.commentForm.reset({
+        author: '',
+        rating: 5,
+        comment: '',
+  
+      });
 
     }
 
 
-
-
-    this.commentForm.reset({
-      author: '',
-      rating: 5,
-      comment: '',
-
-    });
-    this.commentFormDirective.resetForm();
-  }
+    
+  // }
 
   onValueChanged(data?: any) {
     if (!this.commentForm) { return; }
