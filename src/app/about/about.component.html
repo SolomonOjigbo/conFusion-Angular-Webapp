@@ -58,7 +58,7 @@
     <h2>Corporate Leadership</h2>
     <mat-list *ngIf="leaders">
     <mat-list-item *ngFor="let leader of leaders">
-      <img mat-list-avatar height="100px" src={{leader.image}} alt="{leader.name}">
+      <img mat-list-avatar height="100px" src="{{BaseURL + leader.image}}" alt="{leader.name}">
         <h3 matLine> <span>{{leader.name }}</span></h3>
         <h4 matLine><span>{{leader.designation }}</span></h4>
         <p matLine><span>{{leader.abr}}</span></p>
